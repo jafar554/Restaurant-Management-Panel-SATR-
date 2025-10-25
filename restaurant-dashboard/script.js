@@ -6,6 +6,7 @@ class RestaurantDashboard {
         this.isAdmin = false;
         this.adminPassword = CONFIG.ADMIN.PASSWORD;
         this.isOnline = navigator.onLine;
+        this.currentTheme = localStorage.getItem('theme') || 'light';
         
         this.init();
     }
@@ -13,35 +14,10 @@ class RestaurantDashboard {
     async init() {
         this.setupEventListeners();
         this.setupOfflineSupport();
+        this.applyTheme();
         this.loadRestaurantsFromStorage();
         this.checkAdminMode();
         this.updateUIForUserMode();
-    }
-
-    setupOfflineSupport() {
-        // Listen for online/offline events
-        window.addEventListener('online', () => {
-            this.isOnline = true;
-            this.updateOnlineStatus();
-        });
-        
-        window.addEventListener('offline', () => {
-            this.isOnline = false;
-            this.updateOnlineStatus();
-        });
-    }
-
-    updateOnlineStatus() {
-        const statusElement = document.getElementById('onlineStatus');
-        if (statusElement) {
-            statusElement.textContent = this.isOnline ? 'متصل' : 'غير متصل';
-            statusElement.className = this.isOnline ? 'status-online' : 'status-offline';
-        }
-        
-        // Show toast notification for status change
-        if (!this.isOnline) {
-            this.showToast('أنت الآن غير متصل بالإنترنت. يمكن الوصول إلى البيانات المخزنة مؤقتًا فقط.', 'info');
-        }
     }
 
     setupEventListeners() {
@@ -61,7 +37,6 @@ class RestaurantDashboard {
 
         // Add restaurant button
         document.getElementById('addRestaurantBtn').addEventListener('click', () => {
-            this.editingRestaurantId = null;
             this.openRestaurantModal();
         });
 
@@ -80,6 +55,11 @@ class RestaurantDashboard {
             this.searchDeliveryZones(e.target.value);
         });
 
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            this.toggleTheme();
+        });
+
         // Close modal on outside click
         document.getElementById('restaurantModal').addEventListener('click', (e) => {
             if (e.target.id === 'restaurantModal') {
@@ -89,6 +69,44 @@ class RestaurantDashboard {
 
         // Modal buttons (these will be added dynamically)
         this.setupModalEventListeners();
+    }
+
+    setupOfflineSupport() {
+        // Listen for online/offline events
+        window.addEventListener('online', () => {
+            this.isOnline = true;
+            this.updateOnlineStatus();
+        });
+        
+        window.addEventListener('offline', () => {
+            this.isOnline = false;
+            this.updateOnlineStatus();
+        });
+    }
+
+    updateOnlineStatus() {
+        const statusElement = document.getElementById('onlineStatus');
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <i class="fas fa-circle"></i>
+                <span>${this.isOnline ? 'متصل' : 'غير متصل'}</span>
+            `;
+            statusElement.className = this.isOnline ? 'online-status status-online' : 'online-status status-offline';
+        }
+    }
+
+    toggleTheme() {
+        this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', this.currentTheme);
+        this.applyTheme();
+    }
+
+    applyTheme() {
+        document.documentElement.setAttribute('data-theme', this.currentTheme);
+        const themeIcon = document.querySelector('#themeToggle i');
+        if (themeIcon) {
+            themeIcon.className = this.currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
     }
 
     switchSection(section) {
@@ -137,7 +155,6 @@ class RestaurantDashboard {
             }
         }
         this.updateUIForUserMode();
-        this.renderRestaurants();
     }
 
     updateUIForUserMode() {
@@ -146,14 +163,13 @@ class RestaurantDashboard {
         
         if (this.isAdmin) {
             addButton.style.display = 'inline-flex';
-            adminButton.innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل الخروج';
+            adminButton.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span>';
             adminButton.className = 'btn btn-secondary';
         } else {
             addButton.style.display = 'none';
-            adminButton.innerHTML = '<i class="fas fa-user-shield"></i> تسجيل دخول المدير';
+            adminButton.innerHTML = '<i class="fas fa-user-shield"></i> <span>تسجيل دخول المدير</span>';
             adminButton.className = 'btn btn-primary';
         }
-        this.renderRestaurants();
     }
 
     loadRestaurantsFromStorage() {
@@ -161,36 +177,177 @@ class RestaurantDashboard {
         if (savedRestaurants) {
             this.restaurants = JSON.parse(savedRestaurants);
         } else {
-            // Load default sample data if no saved data exists
+            // Load comprehensive restaurant data directly in code
             this.restaurants = [
+                // Juicy & Crunchy - خلدا
                 {
                     id: 1,
-                    name: "UN PIZZA",
+                    name: "جوساوي و كرنشي - خلدا",
                     deliveryZones: [
-                        { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
-                        { zone: "العبدلي", price: 2, deliveryTime: 30 },
-                        { zone: "خلدا", price: 3, deliveryTime: 35 }
+                        // Tier A (1.00-1.50 JOD / 20-30 mins)
+                        { zone: "خلدا", price: 1.00, deliveryTime: 20 },
+                        { zone: "دابوق", price: 1.00, deliveryTime: 22 },
+                        { zone: "تلاع العلي", price: 1.00, deliveryTime: 25 },
+                        { zone: "أم السماق", price: 1.00, deliveryTime: 25 },
+                        { zone: "الصويفية", price: 1.00, deliveryTime: 25 },
+                        { zone: "عبدون", price: 1.50, deliveryTime: 30 },
+                        
+                        // Tier B (1.50-2.00 JOD / 30-45 mins)
+                        { zone: "دير غبار", price: 1.50, deliveryTime: 35 },
+                        { zone: "الجامعة الأردنية", price: 1.50, deliveryTime: 35 },
+                        { zone: "حدائق الحسين", price: 1.50, deliveryTime: 40 },
+                        { zone: "الرابية", price: 1.50, deliveryTime: 40 },
+                        { zone: "العبدلي", price: 1.50, deliveryTime: 40 },
+                        
+                        // Tier C (2.00-3.00 JOD / 45-60 mins)
+                        { zone: "الشميساني", price: 2.00, deliveryTime: 50 },
+                        { zone: "وادي السير", price: 2.00, deliveryTime: 55 },
+                        { zone: "ماركا", price: 2.50, deliveryTime: 55 },
+                        { zone: "طبربور", price: 3.00, deliveryTime: 60 }
                     ]
                 },
+                
+                // Juicy & Crunchy - أبو نصير
                 {
                     id: 2,
-                    name:  "جوسي وكرنشي - أبو نصير",
+                    name: "جوساوي و كرنشي - أبو نصير",
                     deliveryZones: [
-                        { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
-                        { zone: "العبدلي", price: 2, deliveryTime: 30 },
-                        { zone: "خلدا", price: 3, deliveryTime: 35 },
-                        { zone: "الوحدات", price: 4, deliveryTime: 45 }
+                        // Tier A (1.00-1.50 JOD / 20-30 mins)
+                        { zone: "أبو نصير", price: 1.00, deliveryTime: 20 },
+                        { zone: "شفا بدران", price: 1.00, deliveryTime: 22 },
+                        { zone: "الجبية", price: 1.00, deliveryTime: 25 },
+                        { zone: "ضاحية الرشيد", price: 1.00, deliveryTime: 25 },
+                        { zone: "تلاع العلي الشمالي", price: 1.00, deliveryTime: 25 },
+                        { zone: "النزهة", price: 1.00, deliveryTime: 30 },
+                        
+                        // Tier B (1.50-2.00 JOD / 30-45 mins)
+                        { zone: "ماركا الشمالية", price: 1.50, deliveryTime: 35 },
+                        { zone: "طبربور", price: 1.50, deliveryTime: 35 },
+                        { zone: "خلدا", price: 1.50, deliveryTime: 40 },
+                        { zone: "صويلح", price: 1.50, deliveryTime: 40 },
+                        { zone: "ناعور", price: 1.50, deliveryTime: 40 },
+                        
+                        // Tier C (2.00-3.00 JOD / 45-60 mins)
+                        { zone: "الرمثا", price: 2.00, deliveryTime: 50 },
+                        { zone: "المفرق", price: 2.50, deliveryTime: 55 },
+                        { zone: "عجلون", price: 3.00, deliveryTime: 60 }
                     ]
                 },
+                
+                // TAKE A BITE - جبل الحسين
                 {
                     id: 3,
-                    name:    "جوسي وكرنشي - خلدا",
+                    name: "تايك ا بيت - جبل الحسين",
                     deliveryZones: [
-                        { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
-                        { zone: "العبدلي", price: 2, deliveryTime: 30 },
-                        { zone: "خلدا", price: 3, deliveryTime: 35 }
+                        // Tier A (1.00-1.50 JOD / 20-30 mins)
+                        { zone: "جبل الحسين", price: 1.00, deliveryTime: 20 },
+                        { zone: "العبدلي", price: 1.00, deliveryTime: 22 },
+                        { zone: "الشميساني", price: 1.00, deliveryTime: 25 },
+                        { zone: "وسط البلد", price: 1.00, deliveryTime: 25 },
+                        { zone: "اللويبدة", price: 1.00, deliveryTime: 25 },
+                        { zone: "جبل عمّان (الدوار 1)", price: 1.00, deliveryTime: 30 },
+                        { zone: "جبل عمّان (الدوار 2)", price: 1.00, deliveryTime: 30 },
+                        { zone: "جبل عمّان (الدوار 3)", price: 1.00, deliveryTime: 30 },
+                        
+                        // Tier B (1.50-2.00 JOD / 30-45 mins)
+                        { zone: "عبدون", price: 1.50, deliveryTime: 35 },
+                        { zone: "الصويفية", price: 1.50, deliveryTime: 35 },
+                        { zone: "أم أذينة", price: 1.50, deliveryTime: 40 },
+                        { zone: "القويسمة", price: 1.50, deliveryTime: 40 },
+                        
+                        // Tier C (2.00-3.00 JOD / 45-60 mins)
+                        { zone: "اليرموك", price: 2.00, deliveryTime: 50 },
+                        { zone: "جبل الهوس", price: 2.00, deliveryTime: 50 },
+                        { zone: "الدوار الرابع", price: 2.50, deliveryTime: 55 },
+                        { zone: "الدوار الخامس", price: 2.50, deliveryTime: 55 }
                     ]
-                }                
+                },
+                
+                // TAKE A BITE - جبل عمّان
+                {
+                    id: 4,
+                    name: "تايك ا بيت - جبل عمّان",
+                    deliveryZones: [
+                        // Tier A (1.00-1.50 JOD / 20-30 mins)
+                        { zone: "شارع الرينبو", price: 1.00, deliveryTime: 20 },
+                        { zone: "الدوار الأول", price: 1.00, deliveryTime: 22 },
+                        { zone: "الدوار الثاني", price: 1.00, deliveryTime: 22 },
+                        { zone: "الدوار الثالث", price: 1.00, deliveryTime: 25 },
+                        { zone: "عبدون", price: 1.00, deliveryTime: 25 },
+                        { zone: "رغدان", price: 1.00, deliveryTime: 25 },
+                        { zone: "العبدلي", price: 1.00, deliveryTime: 30 },
+                        
+                        // Tier B (1.50-2.00 JOD / 30-45 mins)
+                        { zone: "رأس العين", price: 1.50, deliveryTime: 35 },
+                        { zone: "الصويفية", price: 1.50, deliveryTime: 35 },
+                        { zone: "دير غبار", price: 1.50, deliveryTime: 40 },
+                        { zone: "أم أذينة", price: 1.50, deliveryTime: 40 },
+                        { zone: "القويسمة", price: 1.50, deliveryTime: 40 },
+                        
+                        // Tier C (2.00-3.00 JOD / 45-60 mins)
+                        { zone: "اليرموك", price: 2.00, deliveryTime: 50 },
+                        { zone: "جبل الهوس", price: 2.00, deliveryTime: 50 },
+                        { zone: "الدوار الرابع", price: 2.50, deliveryTime: 55 },
+                        { zone: "الدوار الخامس", price: 2.50, deliveryTime: 55 }
+                    ]
+                },
+                
+                // UN PIZZA - مكسيم مول / جبل الحسين
+                {
+                    id: 5,
+                    name: "أون بيتزا - مكسيم مول / جبل الحسين",
+                    deliveryZones: [
+                        // Tier A (1.00-1.50 JOD / 20-30 mins)
+                        { zone: "جبل الحسين", price: 1.00, deliveryTime: 20 },
+                        { zone: "الشميساني", price: 1.00, deliveryTime: 22 },
+                        { zone: "العبدلي", price: 1.00, deliveryTime: 25 },
+                        { zone: "اللويبدة", price: 1.00, deliveryTime: 25 },
+                        { zone: "جبل عمّان", price: 1.00, deliveryTime: 25 },
+                        { zone: "عبدون", price: 1.00, deliveryTime: 30 },
+                        { zone: "الصويفية", price: 1.00, deliveryTime: 30 },
+                        
+                        // Tier B (1.50-2.00 JOD / 30-45 mins)
+                        { zone: "أم أذينة", price: 1.50, deliveryTime: 35 },
+                        { zone: "تلاع العلي", price: 1.50, deliveryTime: 35 },
+                        { zone: "القويسمة", price: 1.50, deliveryTime: 40 },
+                        { zone: "اليرموك", price: 1.50, deliveryTime: 40 },
+                        { zone: "جبل الهوس", price: 1.50, deliveryTime: 40 },
+                        
+                        // Tier C (2.00-3.00 JOD / 45-60 mins)
+                        { zone: "الدوار الرابع", price: 2.00, deliveryTime: 50 },
+                        { zone: "الدوار الخامس", price: 2.00, deliveryTime: 50 },
+                        { zone: "الدوار السادس", price: 2.50, deliveryTime: 55 },
+                        { zone: "الدوار السابع", price: 2.50, deliveryTime: 55 }
+                    ]
+                },
+                
+                // Additional Restaurant - Pizza Station - عبدون
+                {
+                    id: 6,
+                    name: "بيتزا ستاشن - عبدون",
+                    deliveryZones: [
+                        // Tier A (1.00-1.50 JOD / 20-30 mins)
+                        { zone: "عبدون", price: 1.00, deliveryTime: 20 },
+                        { zone: "الراشدية", price: 1.00, deliveryTime: 22 },
+                        { zone: "جبل عمان", price: 1.00, deliveryTime: 25 },
+                        { zone: "الدوار الأول", price: 1.00, deliveryTime: 25 },
+                        { zone: "الدوار الثاني", price: 1.00, deliveryTime: 25 },
+                        { zone: "الدوار الثالث", price: 1.00, deliveryTime: 30 },
+                        
+                        // Tier B (1.50-2.00 JOD / 30-45 mins)
+                        { zone: "العبدلي", price: 1.50, deliveryTime: 35 },
+                        { zone: "الشميساني", price: 1.50, deliveryTime: 35 },
+                        { zone: "جبل الحسين", price: 1.50, deliveryTime: 40 },
+                        { zone: "الصويفية", price: 1.50, deliveryTime: 40 },
+                        { zone: "القويسمة", price: 1.50, deliveryTime: 40 },
+                        
+                        // Tier C (2.00-3.00 JOD / 45-60 mins)
+                        { zone: "اليرموك", price: 2.00, deliveryTime: 50 },
+                        { zone: "جبل الهوس", price: 2.00, deliveryTime: 50 },
+                        { zone: "الدوار الرابع", price: 2.50, deliveryTime: 55 },
+                        { zone: "الدوار الخامس", price: 2.50, deliveryTime: 55 }
+                    ]
+                }
             ];
             this.saveRestaurantsToStorage();
         }
@@ -228,9 +385,7 @@ class RestaurantDashboard {
 
         card.innerHTML = `
             <div class="restaurant-card-header">
-                <div class="restaurant-title-section">
-                    <h3 class="restaurant-name">${restaurant.name}</h3>
-                </div>
+                <h3 class="restaurant-name">${restaurant.name}</h3>
             </div>
             
             <div class="delivery-zones-enhanced">
@@ -265,9 +420,6 @@ class RestaurantDashboard {
                 <button class="btn edit-btn" data-action="edit" data-id="${restaurant.id}">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
-                <button class="btn add-zone-btn" data-action="add-zone" data-id="${restaurant.id}">
-                    <i class="fas fa-plus-circle"></i> إضافة منطقة
-                </button>
                 <button class="btn delete-btn" data-action="delete" data-id="${restaurant.id}">
                     <i class="fas fa-trash"></i> حذف
                 </button>
@@ -292,11 +444,6 @@ class RestaurantDashboard {
             card.querySelector('.edit-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.editRestaurant(restaurant.id);
-            });
-            
-            card.querySelector('.add-zone-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.addDeliveryZone(restaurant.id);
             });
             
             card.querySelector('.delete-btn').addEventListener('click', (e) => {
@@ -326,9 +473,7 @@ class RestaurantDashboard {
             <div class="restaurant-details-enhanced">
                 <!-- Restaurant Header -->
                 <div class="restaurant-header-modal">
-                    <div class="restaurant-title-section">
-                        <h2 class="restaurant-name-modal">${restaurant.name}</h2>
-                    </div>
+                    <h2 class="restaurant-name-modal">${restaurant.name}</h2>
                 </div>
 
                 <!-- Delivery Zones Card -->
@@ -370,68 +515,34 @@ class RestaurantDashboard {
 
     editRestaurant(restaurantId) {
         const restaurant = this.restaurants.find(r => r.id === restaurantId);
-        if (!restaurant) return;
-
-        this.editingRestaurantId = restaurantId;
-        this.openRestaurantModal(restaurant);
-    }
-
-    addDeliveryZone(restaurantId) {
-        const restaurant = this.restaurants.find(r => r.id === restaurantId);
-        if (!restaurant) return;
-
-        // Add a new empty zone
-        restaurant.deliveryZones.push({
-            zone: "",
-            price: 1,
-            deliveryTime: 30
-        });
-
-        this.saveRestaurantsToStorage();
-        this.renderRestaurants();
-        this.showToast('تمت إضافة منطقة توصيل جديدة', 'success');
-    }
-
-    deleteRestaurant(restaurantId) {
-        if (!confirm('هل أنت متأكد من حذف هذا المطعم؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+        if (!restaurant) {
+            this.showToast('المطعم غير موجود', 'error');
             return;
         }
 
-        this.restaurants = this.restaurants.filter(r => r.id !== restaurantId);
-        this.saveRestaurantsToStorage();
-        this.renderRestaurants();
-        this.showToast('تم حذف المطعم بنجاح', 'success');
-    }
-
-    openRestaurantModal(restaurant = null) {
         const modal = document.getElementById('restaurantModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
 
-        if (restaurant) {
-            modalTitle.textContent = `تعديل ${restaurant.name}`;
-        } else {
-            modalTitle.textContent = 'إضافة مطعم جديد';
-        }
-
-        const deliveryZones = restaurant ? restaurant.deliveryZones : [{ zone: "", price: 1, deliveryTime: 30 }];
-
+        modalTitle.textContent = `تعديل ${restaurant.name}`;
+        
         modalBody.innerHTML = `
-            <form id="restaurantForm">
+            <form id="editRestaurantForm">
+                <input type="hidden" id="editRestaurantId" value="${restaurant.id}">
                 <div class="form-group">
-                    <label for="restaurantName">اسم المطعم *</label>
-                    <input type="text" id="restaurantName" value="${restaurant ? restaurant.name : ''}" required>
+                    <label for="editRestaurantName">اسم المطعم *</label>
+                    <input type="text" id="editRestaurantName" value="${restaurant.name}" required>
                 </div>
 
                 <div class="form-group">
                     <label>مناطق التوصيل</label>
-                    <div id="deliveryZonesContainer">
-                        ${deliveryZones.map((zone, index) => `
+                    <div id="editDeliveryZonesContainer">
+                        ${restaurant.deliveryZones.map((zone, index) => `
                             <div class="zone-input-group" data-index="${index}">
                                 <input type="text" placeholder="اسم المنطقة" class="zone-name-input" value="${zone.zone}">
                                 <input type="number" placeholder="السعر (بالدنانير)" class="zone-price-input" value="${zone.price}" min="1">
                                 <input type="number" placeholder="وقت التوصيل (بالدقائق)" class="zone-time-input" value="${zone.deliveryTime}" min="10">
-                                ${deliveryZones.length > 1 ? `
+                                ${restaurant.deliveryZones.length > 1 ? `
                                     <button type="button" class="remove-zone-btn" onclick="this.parentElement.remove()">
                                         <i class="fas fa-times"></i>
                                     </button>
@@ -439,42 +550,46 @@ class RestaurantDashboard {
                             </div>
                         `).join('')}
                     </div>
-                    <button type="button" id="addZoneBtn">
+                    <button type="button" id="addEditZoneBtn" class="btn btn-secondary">
                         <i class="fas fa-plus"></i> إضافة منطقة أخرى
                     </button>
                 </div>
             </form>
         `;
 
-        // Add event listener for adding zones
+        // Add footer with save/cancel buttons
+        const modalFooter = document.createElement('div');
+        modalFooter.className = 'modal-footer';
+        modalFooter.innerHTML = `
+            <button class="btn btn-secondary" id="cancelEditBtn">
+                <i class="fas fa-times"></i> إلغاء
+            </button>
+            <button class="btn btn-primary" id="saveEditBtn">
+                <i class="fas fa-save"></i> حفظ التغييرات
+            </button>
+        `;
+        modalBody.appendChild(modalFooter);
+
+        // Add event listeners
         setTimeout(() => {
-            document.getElementById('addZoneBtn').addEventListener('click', () => {
-                this.addDeliveryZoneInput();
+            document.getElementById('addEditZoneBtn').addEventListener('click', () => {
+                this.addEditDeliveryZoneInput();
+            });
+            
+            document.getElementById('saveEditBtn').addEventListener('click', () => {
+                this.saveEditedRestaurant();
+            });
+            
+            document.getElementById('cancelEditBtn').addEventListener('click', () => {
+                this.closeModal();
             });
         }, 100);
 
         modal.classList.add('active');
     }
 
-    closeModal() {
-        const modal = document.getElementById('restaurantModal');
-        modal.classList.remove('active');
-        this.editingRestaurantId = null;
-    }
-
-    setupModalEventListeners() {
-        // Use event delegation for dynamically created buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'saveRestaurantBtn') {
-                this.saveRestaurant();
-            } else if (e.target.id === 'editRestaurantBtn') {
-                // This button is not used in the new UI
-            }
-        });
-    }
-
-    addDeliveryZoneInput() {
-        const container = document.getElementById('deliveryZonesContainer');
+    addEditDeliveryZoneInput() {
+        const container = document.getElementById('editDeliveryZonesContainer');
         const index = container.querySelectorAll('.zone-input-group').length;
         const newZoneGroup = document.createElement('div');
         newZoneGroup.className = 'zone-input-group';
@@ -490,20 +605,18 @@ class RestaurantDashboard {
         container.appendChild(newZoneGroup);
     }
 
-    saveRestaurant() {
-        const form = document.getElementById('restaurantForm');
+    saveEditedRestaurant() {
+        const form = document.getElementById('editRestaurantForm');
         if (!form) {
             this.showToast('النموذج غير موجود', 'error');
             return;
         }
 
-        // Get form data
-        const formData = {
-            name: document.getElementById('restaurantName').value.trim()
-        };
+        const restaurantId = parseInt(document.getElementById('editRestaurantId').value);
+        const restaurantName = document.getElementById('editRestaurantName').value.trim();
 
         // Validate required fields
-        if (!formData.name) {
+        if (!restaurantName) {
             this.showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
             return;
         }
@@ -526,34 +639,187 @@ class RestaurantDashboard {
             }
         });
 
-        // If no zones provided, add a default one
+        // If no zones provided, show error
         if (deliveryZones.length === 0) {
-            deliveryZones.push({
-                zone: "منطقة افتراضية",
-                price: 1,
-                deliveryTime: 30
-            });
+            this.showToast('يجب إضافة منطقة توصيل واحدة على الأقل', 'error');
+            return;
         }
 
-        if (this.editingRestaurantId) {
-            // Update existing restaurant
-            const restaurantIndex = this.restaurants.findIndex(r => r.id === this.editingRestaurantId);
-            if (restaurantIndex !== -1) {
-                this.restaurants[restaurantIndex] = {
-                    id: this.editingRestaurantId,
-                    name: formData.name,
-                    deliveryZones: deliveryZones
-                };
-            }
-        } else {
-            // Create new restaurant
-            const newRestaurant = {
-                id: this.restaurants.length > 0 ? Math.max(...this.restaurants.map(r => r.id)) + 1 : 1,
-                name: formData.name,
+        // Find and update the restaurant
+        const restaurantIndex = this.restaurants.findIndex(r => r.id === restaurantId);
+        if (restaurantIndex !== -1) {
+            this.restaurants[restaurantIndex] = {
+                id: restaurantId,
+                name: restaurantName,
                 deliveryZones: deliveryZones
             };
-            this.restaurants.push(newRestaurant);
+            
+            // Save to local storage
+            this.saveRestaurantsToStorage();
+            
+            // Refresh the display
+            this.renderRestaurants();
+            
+            // Close modal
+            this.closeModal();
+            
+            // Show success message
+            this.showToast('تم تعديل معلومات المطعم بنجاح.', 'success');
+        } else {
+            this.showToast('حدث خطأ أثناء الحفظ، حاول مرة أخرى.', 'error');
         }
+    }
+
+    deleteRestaurant(restaurantId) {
+        if (!confirm('هل أنت متأكد من حذف هذا المطعم؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+            return;
+        }
+
+        const restaurant = this.restaurants.find(r => r.id === restaurantId);
+        if (!restaurant) {
+            this.showToast('المطعم غير موجود', 'error');
+            return;
+        }
+
+        this.restaurants = this.restaurants.filter(r => r.id !== restaurantId);
+        this.saveRestaurantsToStorage();
+        this.renderRestaurants();
+        this.showToast('تم حذف المطعم بنجاح.', 'success');
+    }
+
+    openRestaurantModal() {
+        const modal = document.getElementById('restaurantModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        modalTitle.textContent = 'إضافة مطعم جديد';
+        modalBody.innerHTML = `
+            <form id="addRestaurantForm">
+                <div class="form-group">
+                    <label for="newRestaurantName">اسم المطعم *</label>
+                    <input type="text" id="newRestaurantName" placeholder="أدخل اسم المطعم" required>
+                </div>
+
+                <div class="form-group">
+                    <label>مناطق التوصيل</label>
+                    <div id="newDeliveryZonesContainer">
+                        <div class="zone-input-group">
+                            <input type="text" placeholder="اسم المنطقة" class="zone-name-input" required>
+                            <input type="number" placeholder="أدخل سعر التوصيل" class="zone-price-input" value="1" min="1" required>
+                            <input type="number" placeholder="أدخل وقت التوصيل" class="zone-time-input" value="30" min="10" required>
+                        </div>
+                    </div>
+                    <button type="button" id="addNewZoneBtn" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> إضافة منطقة توصيل أخرى
+                    </button>
+                </div>
+            </form>
+        `;
+
+        // Add footer with save/cancel buttons
+        const modalFooter = document.createElement('div');
+        modalFooter.className = 'modal-footer';
+        modalFooter.innerHTML = `
+            <button class="btn btn-secondary" id="cancelAddBtn">
+                <i class="fas fa-times"></i> إلغاء
+            </button>
+            <button class="btn btn-primary" id="saveAddBtn">
+                <i class="fas fa-plus"></i> إضافة المطعم
+            </button>
+        `;
+        modalBody.appendChild(modalFooter);
+
+        // Add event listeners
+        setTimeout(() => {
+            document.getElementById('addNewZoneBtn').addEventListener('click', () => {
+                this.addNewDeliveryZoneInput();
+            });
+            
+            document.getElementById('saveAddBtn').addEventListener('click', () => {
+                this.saveNewRestaurant();
+            });
+            
+            document.getElementById('cancelAddBtn').addEventListener('click', () => {
+                this.closeModal();
+            });
+        }, 100);
+
+        modal.classList.add('active');
+    }
+
+    addNewDeliveryZoneInput() {
+        const container = document.getElementById('newDeliveryZonesContainer');
+        const newZoneGroup = document.createElement('div');
+        newZoneGroup.className = 'zone-input-group';
+        newZoneGroup.innerHTML = `
+            <input type="text" placeholder="اسم المنطقة" class="zone-name-input" required>
+            <input type="number" placeholder="أدخل سعر التوصيل" class="zone-price-input" value="1" min="1" required>
+            <input type="number" placeholder="أدخل وقت التوصيل" class="zone-time-input" value="30" min="10" required>
+            <button type="button" class="remove-zone-btn" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        container.appendChild(newZoneGroup);
+    }
+
+    saveNewRestaurant() {
+        const form = document.getElementById('addRestaurantForm');
+        if (!form) {
+            this.showToast('النموذج غير موجود', 'error');
+            return;
+        }
+
+        const restaurantName = document.getElementById('newRestaurantName').value.trim();
+
+        // Validate required fields
+        if (!restaurantName) {
+            this.showToast('يرجى إدخال اسم المطعم', 'error');
+            return;
+        }
+
+        // Collect delivery zones data
+        const deliveryZones = [];
+        const zoneGroups = document.querySelectorAll('.zone-input-group');
+        
+        let hasEmptyFields = false;
+        zoneGroups.forEach(group => {
+            const zoneName = group.querySelector('.zone-name-input').value.trim();
+            const zonePrice = parseInt(group.querySelector('.zone-price-input').value);
+            const zoneTime = parseInt(group.querySelector('.zone-time-input').value);
+            
+            if (!zoneName || isNaN(zonePrice) || isNaN(zoneTime)) {
+                hasEmptyFields = true;
+                return;
+            }
+            
+            deliveryZones.push({
+                zone: zoneName,
+                price: zonePrice,
+                deliveryTime: zoneTime
+            });
+        });
+
+        // If any fields are empty, show error
+        if (hasEmptyFields) {
+            this.showToast('يرجى ملء جميع حقول مناطق التوصيل', 'error');
+            return;
+        }
+
+        // If no zones provided, show error
+        if (deliveryZones.length === 0) {
+            this.showToast('يجب إضافة منطقة توصيل واحدة على الأقل', 'error');
+            return;
+        }
+
+        // Create new restaurant object
+        const newRestaurant = {
+            id: this.restaurants.length > 0 ? Math.max(...this.restaurants.map(r => r.id)) + 1 : 1,
+            name: restaurantName,
+            deliveryZones: deliveryZones
+        };
+
+        // Add to restaurants array
+        this.restaurants.push(newRestaurant);
 
         // Save to local storage
         this.saveRestaurantsToStorage();
@@ -565,7 +831,21 @@ class RestaurantDashboard {
         this.closeModal();
 
         // Show success message
-        this.showToast(this.editingRestaurantId ? 'تم تحديث المطعم بنجاح!' : `تم إضافة مطعم "${formData.name}" بنجاح!`, 'success');
+        this.showToast('تمت إضافة المطعم بنجاح.', 'success');
+    }
+
+    closeModal() {
+        const modal = document.getElementById('restaurantModal');
+        modal.classList.remove('active');
+    }
+
+    setupModalEventListeners() {
+        // Use event delegation for dynamically created buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'saveRestaurantBtn') {
+                this.saveRestaurant();
+            }
+        });
     }
 
     searchDeliveryZones(query) {
@@ -607,9 +887,7 @@ class RestaurantDashboard {
 
         resultsContainer.innerHTML = results.map(result => `
             <div class="search-result-item">
-                <div class="result-header">
-                    <h4 class="restaurant-name-result">${result.restaurant}</h4>
-                </div>
+                <h3 class="restaurant-name-result">${result.restaurant}</h3>
                 <div class="zone-info-result">
                     <span class="zone-name-result">${result.zone}</span>
                     <span class="zone-price-result">${result.price}</span>
@@ -655,4 +933,17 @@ class RestaurantDashboard {
 // Initialize the dashboard when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     new RestaurantDashboard();
+    
+    // Register service worker for offline functionality
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then((registration) => {
+                    console.log('SW registered: ', registration);
+                })
+                .catch((registrationError) => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+        });
+    }
 });
