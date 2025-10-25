@@ -1,0 +1,7 @@
+Restaurant Name,Status,Phone,Hours,Address,Cuisine,Zone 1,Price 1,Time 1,Zone 2,Price 2,Time 2,Zone 3,Price 3,Time 3
+Bella Vista Restaurant,open,+1 (555) 123-4567,Mon-Sun: 11:00 AM - 10:00 PM,123 Main Street Downtown,Italian,Downtown,$3.99,25-35 min,Midtown,$4.99,30-40 min,Uptown,$5.99,35-45 min
+Spice Garden,open,+1 (555) 234-5678,Mon-Sun: 10:00 AM - 11:00 PM,456 Oak Avenue East Side,Indian,East Side,$2.99,20-30 min,West Side,$3.99,25-35 min,North Side,$4.99,30-40 min
+Ocean Breeze Seafood,closed,+1 (555) 345-6789,Tue-Sun: 12:00 PM - 9:00 PM,789 Harbor Drive Coastal,Seafood,Coastal,$3.99,25-35 min,Harbor,$4.99,30-40 min,,,,
+Golden Dragon,open,+1 (555) 456-7890,Mon-Sun: 11:30 AM - 10:30 PM,321 Dragon Street Chinatown,Chinese,Chinatown,$2.99,20-30 min,Financial District,$3.99,25-35 min,Arts Quarter,$4.99,30-40 min
+Mama's Kitchen,open,+1 (555) 567-8901,Mon-Sat: 8:00 AM - 9:00 PM,654 Family Road Suburbs,American,Suburbs,$2.99,20-30 min,Downtown,$3.99,25-35 min,,,,
+Tokyo Sushi,open,+1 (555) 678-9012,Mon-Sun: 12:00 PM - 10:00 PM,987 Sushi Lane Little Tokyo,Japanese,Little Tokyo,$3.99,25-35 min,Downtown,$4.99,30-40 min,Arts Quarter,$5.99,35-45 min
