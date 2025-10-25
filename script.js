@@ -161,36 +161,75 @@ class RestaurantDashboard {
         if (savedRestaurants) {
             this.restaurants = JSON.parse(savedRestaurants);
         } else {
-            // Load default sample data if no saved data exists
+            // Load default restaurant data directly in code
             this.restaurants = [
+                // Restaurant 1
                 {
                     id: 1,
                     name: "UN PIZZA",
                     deliveryZones: [
                         { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
                         { zone: "العبدلي", price: 2, deliveryTime: 30 },
-                        { zone: "خلدا", price: 3, deliveryTime: 35 }
+                        { zone: "خلدا", price: 3, deliveryTime: 35 },
+                        { zone: "القويسمة", price: 2, deliveryTime: 30 },
+                        { zone: "اليرموك", price: 2, deliveryTime: 25 }
                     ]
                 },
+                // Restaurant 2
                 {
                     id: 2,
-                    name:  "جوسي وكرنشي - أبو نصير",
+                    name: "جوسي وكرنشي - أبو نصير",
                     deliveryZones: [
                         { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
                         { zone: "العبدلي", price: 2, deliveryTime: 30 },
                         { zone: "خلدا", price: 3, deliveryTime: 35 },
-                        { zone: "الوحدات", price: 4, deliveryTime: 45 }
+                        { zone: "الوحدات", price: 4, deliveryTime: 45 },
+                        { zone: "القويسمة", price: 3, deliveryTime: 40 }
                     ]
                 },
+                // Restaurant 3
                 {
                     id: 3,
-                    name:    "جوسي وكرنشي - خلدا",
+                    name: "جوسي وكرنشي - خلدا",
                     deliveryZones: [
                         { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
                         { zone: "العبدلي", price: 2, deliveryTime: 30 },
-                        { zone: "خلدا", price: 3, deliveryTime: 35 }
+                        { zone: "خلدا", price: 3, deliveryTime: 35 },
+                        { zone: "اليرموك", price: 2, deliveryTime: 30 }
                     ]
-                }                
+                },
+                // Restaurant 4
+                {
+                    id: 4,
+                    name: "مamma mia",
+                    deliveryZones: [
+                        { zone: "الرابية", price: 2, deliveryTime: 30 },
+                        { zone: "الدوار الثالث", price: 3, deliveryTime: 35 },
+                        { zone: "الدوار الخامس", price: 4, deliveryTime: 40 },
+                        { zone: "الدوار السابع", price: 5, deliveryTime: 45 }
+                    ]
+                },
+                // Restaurant 5
+                {
+                    id: 5,
+                    name: "كنتاكي - خلدا",
+                    deliveryZones: [
+                        { zone: "خلدا", price: 1, deliveryTime: 20 },
+                        { zone: "اليرموك", price: 2, deliveryTime: 25 },
+                        { zone: "جبل الهوس", price: 3, deliveryTime: 30 }
+                    ]
+                },
+                // Add more restaurants as needed
+                // Restaurant 6
+                {
+                    id: 6,
+                    name: "البيت العربي - عبدون",
+                    deliveryZones: [
+                        { zone: "عبدون", price: 2, deliveryTime: 25 },
+                        { zone: "الراشدية", price: 3, deliveryTime: 30 },
+                        { zone: "جبل عمان", price: 4, deliveryTime: 35 }
+                    ]
+                }
             ];
             this.saveRestaurantsToStorage();
         }
