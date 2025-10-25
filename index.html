@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة إدارة المطاعم - سطر ميديا</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-utensils"></i>
+                    <h1>لوحة إدارة المطاعم</h1>
+                    <span class="powered-by">مدعوم من سطر ميديا</span>
+                </div>
+                <div class="header-actions">
+                    <div class="online-status" id="onlineStatus">
+                        <i class="fas fa-circle"></i>
+                        <span>متصل</span>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        تحديث البيانات
+                    </button>
+                    <button class="btn btn-primary" id="adminLoginBtn">
+                        <i class="fas fa-user-shield"></i>
+                        تسجيل دخول المدير
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Navigation -->
+        <nav class="main-nav">
+            <div class="nav-container">
+                <button class="nav-btn active" data-section="restaurants">
+                    <i class="fas fa-store"></i>
+                    <span>المطاعم</span>
+                </button>
+                <button class="nav-btn" data-section="search">
+                    <i class="fas fa-search"></i>
+                    <span>البحث السريع</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Restaurants Section -->
+            <section id="restaurants-section" class="content-section active">
+                <div class="section-header">
+                    <h2>دليل المطاعم</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" id="addRestaurantBtn" style="display: none;">
+                            <i class="fas fa-plus"></i>
+                            إضافة مطعم
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="restaurants-grid" id="restaurantsGrid">
+                    <!-- Restaurant cards will be dynamically loaded here -->
+                </div>
+            </section>
+
+            <!-- Quick Search Section -->
+            <section id="search-section" class="content-section">
+                <div class="section-header">
+                    <h2>البحث السريع</h2>
+                    <p class="section-subtitle">ابحث عن مناطق التوصيل بسرعة</p>
+                </div>
+                
+                <div class="search-container">
+                    <div class="search-input-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="zoneSearchInput" placeholder="أدخل اسم المنطقة أو الرمز البريدي...">
+                    </div>
+                    <div class="search-results" id="searchResults">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Restaurant Modal -->
+        <div id="restaurantModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">تفاصيل المطعم</h3>
+                    <button class="modal-close" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Restaurant details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="editRestaurantBtn">تعديل</button>
+                    <button class="btn btn-primary" id="saveRestaurantBtn">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري تحميل البيانات...</p>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
