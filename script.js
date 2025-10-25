@@ -89,6 +89,23 @@ class RestaurantDashboard {
 
         // Modal buttons (these will be added dynamically)
         this.setupModalEventListeners();
+
+        // Add reset to default button for admin
+        if (this.isAdmin) {
+            const resetButton = document.createElement('button');
+            resetButton.className = 'btn btn-secondary';
+            resetButton.innerHTML = '<i class="fas fa-undo"></i> إعادة تعيين البيانات';
+            resetButton.id = 'resetDataBtn';
+            resetButton.style.display = 'none'; // Will be shown when admin logs in
+            document.querySelector('.header-actions').appendChild(resetButton);
+            
+            resetButton.addEventListener('click', () => {
+                if (confirm('هل أنت متأكد من إعادة تعيين جميع البيانات إلى القيم الافتراضية؟')) {
+                    this.loadDefaultRestaurants();
+                }
+            });
+        }
+        
     }
 
     switchSection(section) {
@@ -143,17 +160,25 @@ class RestaurantDashboard {
     updateUIForUserMode() {
         const addButton = document.getElementById('addRestaurantBtn');
         const adminButton = document.getElementById('adminLoginBtn');
+        const exportButton = document.getElementById('exportDataBtn');
+        const importButton = document.getElementById('importDataBtn');
+        const resetButton = document.getElementById('resetDataBtn');
         
         if (this.isAdmin) {
             addButton.style.display = 'inline-flex';
+            exportButton.style.display = 'inline-flex';
+            importButton.style.display = 'inline-flex';
+            if (resetButton) resetButton.style.display = 'inline-flex';
             adminButton.innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل الخروج';
             adminButton.className = 'btn btn-secondary';
         } else {
             addButton.style.display = 'none';
+            exportButton.style.display = 'none';
+            importButton.style.display = 'none';
+            if (resetButton) resetButton.style.display = 'none';
             adminButton.innerHTML = '<i class="fas fa-user-shield"></i> تسجيل دخول المدير';
             adminButton.className = 'btn btn-primary';
         }
-        this.renderRestaurants();
     }
 
     loadRestaurantsFromStorage() {
@@ -669,6 +694,82 @@ class RestaurantDashboard {
                 <p>أدخل اسم المنطقة أو الرمز البريدي للبحث عن مناطق التوصيل</p>
             </div>
         `;
+    }
+
+    loadDefaultRestaurants() {
+        // Same data as in loadRestaurantsFromStorage
+        this.restaurants = [
+            // Restaurant 1
+            {
+                id: 1,
+                name: "UN PIZZA",
+                deliveryZones: [
+                    { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
+                    { zone: "العبدلي", price: 2, deliveryTime: 30 },
+                    { zone: "خلدا", price: 3, deliveryTime: 35 },
+                    { zone: "القويسمة", price: 2, deliveryTime: 30 },
+                    { zone: "اليرموك", price: 2, deliveryTime: 25 }
+                ]
+            },
+            // Restaurant 2
+            {
+                id: 2,
+                name: "جوسي وكرنشي - أبو نصير",
+                deliveryZones: [
+                    { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
+                    { zone: "العبدلي", price: 2, deliveryTime: 30 },
+                    { zone: "خلدا", price: 3, deliveryTime: 35 },
+                    { zone: "الوحدات", price: 4, deliveryTime: 45 },
+                    { zone: "القويسمة", price: 3, deliveryTime: 40 }
+                ]
+            },
+            // Restaurant 3
+            {
+                id: 3,
+                name: "جوسي وكرنشي - خلدا",
+                deliveryZones: [
+                    { zone: "جبل الحسين", price: 1, deliveryTime: 25 },
+                    { zone: "العبدلي", price: 2, deliveryTime: 30 },
+                    { zone: "خلدا", price: 3, deliveryTime: 35 },
+                    { zone: "اليرموك", price: 2, deliveryTime: 30 }
+                ]
+            },
+            // Restaurant 4
+            {
+                id: 4,
+                name: "مamma mia",
+                deliveryZones: [
+                    { zone: "الرابية", price: 2, deliveryTime: 30 },
+                    { zone: "الدوار الثالث", price: 3, deliveryTime: 35 },
+                    { zone: "الدوار الخامس", price: 4, deliveryTime: 40 },
+                    { zone: "الدوار السابع", price: 5, deliveryTime: 45 }
+                ]
+            },
+            // Restaurant 5
+            {
+                id: 5,
+                name: "كنتاكي - خلدا",
+                deliveryZones: [
+                    { zone: "خلدا", price: 1, deliveryTime: 20 },
+                    { zone: "اليرموك", price: 2, deliveryTime: 25 },
+                    { zone: "جبل الهوس", price: 3, deliveryTime: 30 }
+                ]
+            },
+            // Add more restaurants as needed
+            // Restaurant 6
+            {
+                id: 6,
+                name: "البيت العربي - عبدون",
+                deliveryZones: [
+                    { zone: "عبدون", price: 2, deliveryTime: 25 },
+                    { zone: "الراشدية", price: 3, deliveryTime: 30 },
+                    { zone: "جبل عمان", price: 4, deliveryTime: 35 }
+                ]
+            }
+        ];
+        this.saveRestaurantsToStorage();
+        this.renderRestaurants();
+        this.showToast('تمت إعادة تعيين البيانات إلى القيم الافتراضية', 'success');
     }
 
     showToast(message, type = 'info') {
